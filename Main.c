@@ -47,8 +47,18 @@ int P = 1;
 double I = 0.3;
 int D = 1;
 int previousError = 0;
-int turn180 = 0;
-int Not_done[15] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+int DOT[] = { 2 , 0 , 1 , 3 , 6 , 2 , 0 , 1 , 3 , 0 , 5 , 3 , 2 , 3 , 0 , 2 , 3 , 2 , 4 , 1 , 0 }; //Turn Sequence
+int Order = -1;
+int Torder = 0;
+int not_done[] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+
+
+//test variables:
+int nav_dist_h = 4;
+int nav_dist_l = -1;
+int stn_dist_h = 0;
+int stn_dist_l = -8;
+
 //void run(double Kp, double Ki, double Kd);
 
 
@@ -97,8 +107,8 @@ int TurnTo(int curRot, int targetRot)
     int turningSpeed;
     if (Duration >= 0 && Duration <= 8)
     {
-        WheelLeft = 40;
-        WheelRight = 40;
+        WheelLeft = 100;
+        WheelRight = 100;
         if (Duration == 0)
             return 0;
         return 1;
@@ -107,9 +117,9 @@ int TurnTo(int curRot, int targetRot)
     if (angleDiff <= angularErrorThreshold || angleDiff > 360 - angularErrorThreshold)
         turningSpeed = 0;
     else if (angleDiff <= 180)
-        turningSpeed = angleDiff / 6 + 3;
+        turningSpeed = angleDiff / 2 + 6;
     else
-        turningSpeed = (angleDiff - 360) / 6 - 3;
+        turningSpeed = (angleDiff - 360) / 2 - 6;
     WheelLeft = turningSpeed;
     WheelRight = -WheelLeft;
     if (turningSpeed == 0)
@@ -134,24 +144,42 @@ void run(double Kp, double Ki, double Kd, int PWR) {
     WheelRight = PWR - PID;
 }
 
-int checkarray(int x, int arr)
+void Turning(int Torder)
 {
-    int arrlen = sizeof arr / sizeof arr[0];
-    int isElementPresent = 0;
-    for (int i = 0, i < arrlen; i++)
+    switch (Torder)
     {
-        if (arr[i] == x)
-        {
-            isElementPresent = 1;
-            break;
-        }
+    case 0: //DOT= Direction of turn
+        TurnTo(RotationZ, 0);
+        printf("turnto");
+        break;
+    case 1:
+        TurnTo(RotationZ, 90);
+        printf("turnto");
+        break;
+    case 2:
+        TurnTo(RotationZ, 180);
+        printf("turnto");
+        break;
+    case 3:
+        TurnTo(RotationZ, 270);
+        printf("turnto");
+        break;
+    case 4:
+        TurnTo(RotationZ, 110);
+        printf("turnto");
+        break;
+    case 5:
+        TurnTo(RotationZ, 300);
+        printf("turnto");
+        break;
+    case 6:
+        TurnTo(RotationZ, 200);
+        printf("turnto");
+        break;
+    default:
+        break;
     }
-    return isElementPresent;
 }
-
-int 
-
-
 
 struct DeliveryItem
 {
@@ -201,7 +229,7 @@ void AILoopStart()
 
 DLL_EXPORT char* GetTeamName()
 {
-    return "Test";
+    return "Cyber Potatoes";
 }
 
 char info[3000];
@@ -273,26 +301,39 @@ void Game0()
     {
         Duration--;
     }
-    else if (turn180 == 1)
+    else if (StnID >= 1 && StnID <= 100 && StnDist >= 0 && StnDist <= 1)
     {
-        Duration = 65;
-        CurAction = 5;
+        if (not_done[StnID - 1] == 0)
+        {
+            Duration = 80;
+            CurAction = 1;
+            not_done[StnID - 1] = 1;
+            for (int i = 0; i < 15; i++)
+            {
+                printf("%d ", not_done[i]);
+            }
+        }
     }
-    else if (StnID >= 1 && StnID <= 1 && StnDist >= 0 && StnDist <= 0)
+    else if (StnID == 1 && StnDist >= stn_dist_l && StnDist <= stn_dist_h || StnID == 10 && StnDist >= stn_dist_l && StnDist <= stn_dist_h || StnID == 8 && StnDist >= stn_dist_l && StnDist <= stn_dist_h || StnID == 9 && StnDist >= stn_dist_l && StnDist <= stn_dist_h)
     {
-        Duration = 85;
-        CurAction = 1;
-        turn180 = 1;
-    }
-    else if (NavID >= 25 && NavID <= 25 && NavDist <= 6)
-    {
-        Duration = 10;
+        Duration = 23;
         CurAction = 4;
+        Order++;
     }
-    else if (NavID >= 17 && NavID <= 17 && NavDist <= 4)
+    else if (NavID == 17 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 22 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 24 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 28 && NavDist >= -2 && NavDist <= 4 || NavID == 27 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 26 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 9 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 6 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 5 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 16 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 13 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 12 && NavDist >= nav_dist_l && NavDist <= nav_dist_h || NavID == 21 && NavDist >= nav_dist_l && NavDist <= nav_dist_h)
     {
-        Duration = 10;
-        CurAction = 2;
+        if (NavID == 28 && not_done[9 - 1] == 0)
+        {
+            Duration = 0;
+            CurAction = 3;
+        }
+        else
+        {
+            Duration = 10;
+            CurAction = 2;
+            Order++;
+        }
+        
     }
     else if (true)
     {
@@ -302,44 +343,35 @@ void Game0()
     switch (CurAction)
     {
     case 1:
-        if StnID 
         WheelLeft = 0;
         WheelRight = 0;
         LED = 1;
-        if (Duration < 6)
-        {
-            WheelLeft = 60;
-            WheelRight = 60;
-        }
         break;
     case 2:
         WheelLeft = 0;
         WheelRight = 0;
         LED = 0;
-        TurnTo(RotationZ, 180);
-        printf("turnto");
+        Torder = DOT[Order];
+        Turning(Torder);
         break;
     case 3:
         WheelLeft = 0;
         WheelRight = 0;
-        run(1.6, 0.000000001, 10,100);
+        run(0.96, 0.01, 7.55, 100);
         LED = 0;
         break;
     case 4:
         WheelLeft = 0;
         WheelRight = 0;
-        TurnTo(RotationZ, 115);
         LED = 0;
-    case 5:
-        WheelLeft = -20;
-        WheelRight = 20;
-        LED = 0;
-        turn180 = 0;
-        if (Duration < 16) // Go Forward to Leave Center.
+        Torder = DOT[Order];
+        Turning(Torder);
+        if (Duration <= 10) // Go Forward to Leave Center.
         {
-            WheelLeft = 40;
-            WheelRight = 40;
+            WheelLeft = 100;
+            WheelRight = 100;
         }
+        break;
     default:
         break;
     }
@@ -363,4 +395,3 @@ DLL_EXPORT void AILoop()
         break;
     }
 }
-
